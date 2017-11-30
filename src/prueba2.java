@@ -36,7 +36,7 @@ public class prueba2 {
 				"automaticos"};
 		
 		try {
-			//Creo conexión
+			//Creo conexiï¿½n
 			Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/webir", "postgres", "admin");
 			
 			//Para cada pagina de multicar
@@ -47,7 +47,7 @@ public class prueba2 {
 			for (int i=0;i<5;i++){
 				extraerPlusCar(urlsPlus[i],myConn,categorias[i]);	
 			}
-			//Cierro conexión
+			//Cierro conexiï¿½n
 			myConn.close();
 			
 		} catch (SQLException e) {
@@ -59,8 +59,8 @@ public class prueba2 {
 	public static void extraerMulticar(String url, Connection conn) {
 		try{
 			  int pasajeros = 0;
-			  String valijas = null;
-			  String transmision = null;
+			  int valijas = 0;
+			  boolean transmision = false;
 			  int puertas = 0;
 			  boolean aire = false;
 			  int cilindrada = 0;
@@ -84,9 +84,21 @@ public class prueba2 {
 					   switch(i) {
 					   case 1: pasajeros = extraerPrimerEntero(li.getText());
 					   		break;
-					   case 2: valijas = li.getText();
+					   case 2: String valorValijas = li.getText();
+					   		   String[] valores = valorValijas.split(" ");
+						   	   System.out.println(valores[0]);
+					   		   if (!valores[0].equals("&#8211;")) {
+						   		   valijas = Integer.parseInt(valores[0]);
+						   	   } else {
+						   		   valijas = -1;
+						   	   }
 					   		break;
-					   case 3: transmision = li.getText();
+					   case 3: String valor = li.getText();
+						   	   if (valor.toLowerCase().contains("auto")) {
+						   		   transmision = true;
+						   	   } else {
+						   		   transmision = false;
+						   	   }
 					   		break;
 					   case 4: puertas = extraerPrimerEntero(li.getText());
 					   		break;
@@ -205,7 +217,7 @@ public class prueba2 {
 			    System.out.println("Cilindrada: "+cilindrada);
 			    
 			   //GUARDO EN BD
-			   guardarBD(conn,titulo,cate,urlimg,pasajeros,"","",puertas,true,cilindrada,economico,caro,2);
+			   guardarBD(conn,titulo,cate,urlimg,pasajeros,-1,false,puertas,true,cilindrada,economico,caro,2);
 			}
 			
 		} catch (ResponseException e) {
@@ -218,7 +230,7 @@ public class prueba2 {
 				}
 	}
 	
-	public static void guardarBD(Connection conn,String titulo,String categoria,String urlimg, int cantpasajeros,String cantvalijas,String transmision,int cantpuertas,boolean aire,int cilindrada,int preciobajo,int precioalto,int idempresa){
+	public static void guardarBD(Connection conn,String titulo,String categoria,String urlimg, int cantpasajeros,int cantvalijas,boolean transmision,int cantpuertas,boolean aire,int cilindrada,int preciobajo,int precioalto,int idempresa){
 		String SSQL 	= "insert into vehiculos (titulo,categoria,urlimg,cantpasajeros,cantvalijas,transmision,cantpuertas,aire,cilindrada,preciobajo,precioalto,idempresa)"+
 				  "values (?,?,?,?,?,?,?,?,?,?,?,?)";
 		try {
@@ -227,8 +239,8 @@ public class prueba2 {
 		    psql.setString(2, categoria);
 		    psql.setString(3, urlimg);
 		    psql.setInt(4, cantpasajeros);
-		    psql.setString(5, cantvalijas);
-		    psql.setString(6, transmision);
+		    psql.setInt(5, cantvalijas);
+		    psql.setBoolean(6, transmision);
 		    psql.setInt(7, cantpuertas);
 		    psql.setBoolean(8, aire);
 		    psql.setInt(9, cilindrada);
@@ -265,7 +277,7 @@ public class prueba2 {
 	}
 
 	public static boolean getBoolean(String es){
-		if (es.equals("Si")||es.equals("Sí")){
+		if (es.equals("Si")||es.equals("Sï¿½")){
 			return true;
 		}	
 		else{
